@@ -12,7 +12,8 @@ use ark_serialize::Read;
 use ark_serialize::Write;
 use ark_std::UniformRand;
 use eyre::Result;
-use rand::thread_rng;
+use rand_pcg::Pcg64;
+use rand_seeder::Seeder;
 use rayon::iter::IndexedParallelIterator;
 use rayon::iter::ParallelIterator;
 use rayon::prelude::IntoParallelIterator;
@@ -38,26 +39,26 @@ fn write_json_file(path: &Path, contents: &str) -> Result<()> {
 /**
  * We'll use this function for the cli
  */
-pub fn contribute_with_file(in_path: &Path, out_path: &Path) -> Result<()> {
+pub fn contribute_with_file(in_path: &Path, out_path: &Path, string_seed: String) -> Result<()> {
     let json = load_json_file(in_path)?;
-    let result = contribute_with_string(json)?;
+    let result = contribute_with_string(json, string_seed)?;
     write_json_file(out_path, &result)
 }
 
 /**
  * We'll use this function in the wasm
  */
-pub fn contribute_with_string(json: String) -> Result<String> {
+pub fn contribute_with_string(json: String, string_seed: String) -> Result<String> {
     let prev = serde_json::from_str(&json).unwrap();
-    let post = contribute(serde_json::from_value::<Contributions>(prev)?)?;
+    let post = contribute(serde_json::from_value::<Contributions>(prev)?, string_seed)?;
     Ok(serde_json::to_string(&post)?)
 }
 
 /**
  * Apply a user's contibution to the setup
  */
-fn contribute(prev_contributions: Contributions) -> Result<Contributions> {
-    let mut rng = thread_rng();
+fn contribute(prev_contributions: Contributions, string_seed: String) -> Result<Contributions> {
+    let mut rng: Pcg64 = Seeder::from(string_seed).make_rng();
 
     // private contribution
     let t = ScalarField::rand(&mut rng);

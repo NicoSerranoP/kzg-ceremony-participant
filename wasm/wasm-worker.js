@@ -1,6 +1,7 @@
 import init, {init_threads, contribute_wasm} from "./pkg/kate_ptau_rs.js";
 
-(async () => {
+onmessage = async (event) => {
+    const entropy = event.data;
     console.log("available threads:", navigator.hardwareConcurrency);
 
     await init();
@@ -11,9 +12,9 @@ import init, {init_threads, contribute_wasm} from "./pkg/kate_ptau_rs.js";
             var json_string = JSON.stringify(data);
             var startTime = performance.now()
             console.log("start");
-            var res = contribute_wasm(json_string);
+            var res = contribute_wasm(json_string, entropy);
             var endTime = performance.now()
             console.log(`Contribution took ${endTime - startTime} milliseconds`)
         });
     });
-})();
+}

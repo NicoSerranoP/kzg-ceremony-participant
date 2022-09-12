@@ -12,7 +12,7 @@ pub fn init_threads(n: usize) -> Promise {
 }
 
 #[wasm_bindgen]
-pub fn contribute_wasm(input: &str) -> String {
-    let response = contribute_with_string(input.to_string()).unwrap();
+pub fn contribute_wasm(input: &str, string_seed: &str) -> String {
+    let response = contribute_with_string(input.to_string(), string_seed.to_string()).unwrap();
     return format!("{}", response);
 }

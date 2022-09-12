@@ -2,16 +2,23 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>hello-wasm example</title>
+    <title>KZG Ceremony contribution</title>
   </head>
   <body>
+    <label for="entropy">Input your randomly generated entropy:</label>
+    <input type="text" id="entropy" name="entropy">
+    <button type="button" id="button">Contribute</button>
 
     <script src="module-workers-polyfill.min.js"></script>
     <script type="module">
-      const worker = new Worker('wasm-worker.js', {
-        type: 'module'
+      document.getElementById('button').addEventListener('click', () => {
+        const worker = new Worker('wasm-worker.js', {
+          type: 'module'
+        });
+        const entropy = document.getElementById('entropy').value;
+        // start worker
+        worker.postMessage(entropy);
       });
-        
     </script>
   </body>
 </html>
